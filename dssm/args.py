@@ -11,3 +11,5 @@ vocab_size = 7901
 class_size = 2
 
 epochs = 50
+
+batch_size = 10000

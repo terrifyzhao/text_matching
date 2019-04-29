@@ -1,5 +1,5 @@
 import tensorflow as tf
-import args
+from dssm import args
 
 
 class Graph:

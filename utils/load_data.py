@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from utils.data_utils import shuffle, pad_sequences
-import args
+from dssm import args
 
 
 def load_char_vocab():
