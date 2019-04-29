@@ -7,11 +7,12 @@ from dssm.graph import Graph
 import tensorflow as tf
 from utils.load_data import load_data
 
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 p, h, y = load_data('input/test.csv', data_size=None)
 
 model = Graph()
 saver = tf.train.Saver()
-# ckpt = tf.train.latest_checkpoint('../output/dssm/dssm_49.ckpt')
 
 with tf.Session()as sess:
     sess.run(tf.global_variables_initializer())
