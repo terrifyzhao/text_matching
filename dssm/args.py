@@ -2,9 +2,9 @@ seq_length = 15
 
 char_embedding_size = 100
 
-learning_rate = 0.001
+learning_rate = 0.0005
 
-drop_rate = 0.3
+keep_prob = 0.7
 
 vocab_size = 7901
 

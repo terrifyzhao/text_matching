@@ -7,17 +7,23 @@ class Graph:
         self.p = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
         self.h = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
         self.y = tf.placeholder(dtype=tf.int32, shape=None, name='y')
+        self.keep_prob = tf.placeholder(dtype=tf.float32, name='drop_rate')
 
         self.embedding = tf.get_variable(dtype=tf.float32, shape=(args.vocab_size, args.char_embedding_size),
                                          name='embedding')
 
         self.forward()
 
-    @staticmethod
-    def fully_connect(x):
+    def dropout(self, x):
+        return tf.nn.dropout(x, keep_prob=self.keep_prob)
+
+    def fully_connect(self, x):
         x = tf.layers.dense(x, 256, activation='tanh')
+        x = self.dropout(x)
         x = tf.layers.dense(x, 512, activation='tanh')
+        x = self.dropout(x)
         x = tf.layers.dense(x, 256, activation='tanh')
+        x = self.dropout(x)
         x = tf.reshape(x, shape=(-1, x.shape[1] * x.shape[2]))
 
         return x
@@ -27,7 +33,6 @@ class Graph:
         p_norm = tf.norm(p, axis=1, keepdims=True)
         h_norm = tf.norm(p, axis=1, keepdims=True)
 
-        # cosine = tf.matmul(p, tf.transpose(h, perm=[1, 0])) / (p_norm * h_norm)
         cosine = tf.reduce_sum(tf.multiply(p, h), axis=1, keepdims=True) / (p_norm * h_norm)
 
         return cosine

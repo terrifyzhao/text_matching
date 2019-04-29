@@ -1,10 +1,15 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+
 from dssm.graph import Graph
 import tensorflow as tf
 from utils.load_data import load_data
 from dssm import args
 
-p, h, y = load_data('input/train.csv', data_size=1000)
-p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=1000)
+p, h, y = load_data('input/train.csv', data_size=None)
+p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=None)
 
 p_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
 h_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
@@ -24,21 +29,23 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.9
 
 with tf.Session(config=config)as sess:
     sess.run(tf.global_variables_initializer())
-    sess.run(iterator, feed_dict={p_holder: p, h_holder: h, y_holder: y})
-    steps = len(y) / args.batch_size
+    sess.run(iterator.initializer, feed_dict={p_holder: p, h_holder: h, y_holder: y})
+    steps = int(len(y) / args.batch_size)
     for epoch in range(args.epochs):
         for step in range(steps):
             p_batch, h_batch, y_batch = sess.run(next_element)
             _, loss, acc = sess.run([model.train_op, model.loss, model.acc],
                                     feed_dict={model.p: p_batch,
                                                model.h: h_batch,
-                                               model.y: y_batch})
+                                               model.y: y_batch,
+                                               model.keep_prob: args.keep_prob})
             print('loss: ', loss, ' acc:', acc)
 
         loss_eval, acc_eval = sess.run([model.loss, model.acc],
                                        feed_dict={model.p: p_eval,
                                                   model.h: h_eval,
-                                                  model.y: y_eval})
+                                                  model.y: y_eval,
+                                                  model.keep_prob: 1})
         print('loss_eval: ', loss_eval, ' acc_eval:', acc_eval)
         print('\n')
         saver.save(sess, f'../output/dssm/dssm_{epoch}.ckpt')
