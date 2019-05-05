@@ -15,4 +15,4 @@ class_size = 2
 
 epochs = 50
 
-batch_size = 100
+batch_size = 1024

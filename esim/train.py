@@ -48,4 +48,4 @@ with tf.Session(config=config)as sess:
                                                   model.keep_prob: 1})
         print('loss_eval: ', loss_eval, ' acc_eval:', acc_eval)
         print('\n')
-        saver.save(sess, f'../output/esim/esim{epoch}.ckpt')
+        saver.save(sess, f'../output/esim/esim_{epoch}.ckpt')

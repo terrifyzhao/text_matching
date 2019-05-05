@@ -5,9 +5,9 @@ from esim import args
 class Graph:
 
     def __init__(self):
-        self.p = tf.placeholder(dtype=tf.int32, shape=(100, args.seq_length), name='p')
-        self.h = tf.placeholder(dtype=tf.int32, shape=(100, args.seq_length), name='h')
-        self.y = tf.placeholder(dtype=tf.int32, shape=100, name='y')
+        self.p = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
+        self.h = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
+        self.y = tf.placeholder(dtype=tf.int32, shape=None, name='y')
         self.keep_prob = tf.placeholder(dtype=tf.float32, name='drop_rate')
 
         self.embedding = tf.get_variable(dtype=tf.float32, shape=(args.vocab_size, args.char_embedding_size),
@@ -26,10 +26,10 @@ class Graph:
 
     @staticmethod
     def cosine(p, h):
-        # p_norm = tf.norm(p, axis=2, keepdims=True, ord=1)
-        # h_norm = tf.norm(p, axis=2, keepdims=True, ord=1)
+        p_norm = tf.norm(p, axis=2, keepdims=True)
+        h_norm = tf.norm(p, axis=2, keepdims=True)
 
-        cosine = tf.multiply(p, h) / tf.abs(p) * tf.abs(h)
+        cosine = tf.matmul(p, tf.transpose(h, perm=[0, 2, 1])) / (p_norm * h_norm)
 
         return cosine
 
@@ -50,10 +50,10 @@ class Graph:
 
         e = self.cosine(p, h)
 
-        a_attention = tf.reduce_sum(tf.matmul(e, tf.transpose(a, perm=[0, 2, 1]))) / tf.reduce_sum(e, axis=2,
-                                                                                                   keepdims=True)
-        b_attention = tf.reduce_sum(tf.matmul(e, tf.transpose(b, perm=[0, 2, 1]))) / tf.reduce_sum(e, axis=2,
-                                                                                                   keepdims=True)
+        a_attention = tf.reduce_sum(tf.matmul(e, a)) / tf.reduce_sum(e, axis=2,
+                                                                     keepdims=True)
+        b_attention = tf.reduce_sum(tf.matmul(e, b)) / tf.reduce_sum(e, axis=2,
+                                                                     keepdims=True)
 
         m_a = tf.concat((a, a_attention, a - a_attention, a * a_attention), axis=2)
         m_b = tf.concat((b, b_attention, b - b_attention, b * b_attention), axis=2)
