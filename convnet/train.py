@@ -3,13 +3,13 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
-from esim.graph import Graph
+from convnet.graph import Graph
 import tensorflow as tf
 from utils.load_data import load_data
-from esim import args
+from convnet import args
 
 p, h, y = load_data('input/train.csv', data_size=None)
-p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=1000)
+p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=args.batch_size)
 
 p_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
 h_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
@@ -53,4 +53,4 @@ with tf.Session(config=config)as sess:
             last_loss = loss_eval
         if loss_eval > last_loss:
             break
-        saver.save(sess, f'../output/esim/esim_{epoch}.ckpt')
+        saver.save(sess, f'../output/convnet/convnet_{epoch}.ckpt')

@@ -24,15 +24,6 @@ class Graph:
 
         return tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell, x, dtype=tf.float32)
 
-    @staticmethod
-    def cosine(p, h):
-        p_norm = tf.norm(p, axis=2, keepdims=True)
-        h_norm = tf.norm(p, axis=2, keepdims=True)
-
-        cosine = tf.matmul(p, tf.transpose(h, perm=[0, 2, 1])) / (p_norm * h_norm)
-
-        return cosine
-
     def forward(self):
         p_embedding = tf.nn.embedding_lookup(self.embedding, self.p)
         h_embedding = tf.nn.embedding_lookup(self.embedding, self.h)
@@ -54,11 +45,6 @@ class Graph:
 
         a = tf.matmul(a_attention, h)
         b = tf.matmul(b_attention, p)
-
-        # e = self.cosine(p, h)
-
-        # a_attention = tf.reduce_sum(tf.matmul(e, a)) / tf.reduce_sum(e, axis=2, keepdims=True)
-        # b_attention = tf.reduce_sum(tf.matmul(e, b)) / tf.reduce_sum(e, axis=2, keepdims=True)
 
         m_a = tf.concat((a, p, a - p, a * p), axis=2)
         m_b = tf.concat((b, h, b - h, b * h), axis=2)
