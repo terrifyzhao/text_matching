@@ -16,10 +16,10 @@
 测试集结果对比：
 
 模型|loss|acc|论文地址
---|--|--|--|--
+--|--|--|--|-- 
 DSSM|0.7613157|0.6864|[DSSM](https://posenhuang.github.io/papers/cikm2013_DSSM_fullversion.pdf)
 ESIM|0.55444807|0.736|[ESIM](https://arxiv.org/pdf/1609.06038.pdf)
-CONVNET|0.6872447|0.6977|[ConvNet]([http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.723.6492&rep=rep1&type=pdf)
+ConvNet|0.6872447|0.6977|[ConvNet]([http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.723.6492&rep=rep1&type=pdf)
 
 
 
