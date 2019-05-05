@@ -45,18 +45,23 @@ class Graph:
         p = tf.concat([p_f, p_b], axis=2)
         h = tf.concat([h_f, h_b], axis=2)
 
-        a = self.dropout(p)
-        b = self.dropout(h)
+        p = self.dropout(p)
+        h = self.dropout(h)
 
-        e = self.cosine(p, h)
+        e = tf.matmul(p, tf.transpose(h, perm=[0, 2, 1]))
+        a_attention = tf.nn.softmax(e)
+        b_attention = tf.transpose(tf.nn.softmax(tf.transpose(e)))
 
-        a_attention = tf.reduce_sum(tf.matmul(e, a)) / tf.reduce_sum(e, axis=2,
-                                                                     keepdims=True)
-        b_attention = tf.reduce_sum(tf.matmul(e, b)) / tf.reduce_sum(e, axis=2,
-                                                                     keepdims=True)
+        a = tf.matmul(a_attention, h)
+        b = tf.matmul(b_attention, p)
 
-        m_a = tf.concat((a, a_attention, a - a_attention, a * a_attention), axis=2)
-        m_b = tf.concat((b, b_attention, b - b_attention, b * b_attention), axis=2)
+        # e = self.cosine(p, h)
+
+        # a_attention = tf.reduce_sum(tf.matmul(e, a)) / tf.reduce_sum(e, axis=2, keepdims=True)
+        # b_attention = tf.reduce_sum(tf.matmul(e, b)) / tf.reduce_sum(e, axis=2, keepdims=True)
+
+        m_a = tf.concat((a, p, a - p, a * p), axis=2)
+        m_b = tf.concat((b, h, b - h, b * h), axis=2)
 
         with tf.variable_scope("lstm_a", reuse=tf.AUTO_REUSE):
             (a_f, a_b), _ = self.bilstm(m_a, args.context_hidden_size)
@@ -74,12 +79,6 @@ class Graph:
 
         a_max = tf.reduce_max(a, axis=2)
         b_max = tf.reduce_max(b, axis=2)
-
-        # a_avg = tf.nn.avg_pool(a, ksize=(1, 512), strides=[1, 1, 1, 1], padding='VALID')
-        # b_avg = tf.nn.avg_pool(b, ksize=(512, 1), strides=[1, 1, 1, 1], padding='VALID')
-        #
-        # a_max = tf.nn.max_pool(a, ksize=(512, 1), strides=[1, 1, 1, 1], padding='VALID')
-        # b_max = tf.nn.max_pool(b, ksize=(512, 1), strides=[1, 1, 1, 1], padding='VALID')
 
         v = tf.concat((a_avg, a_max, b_avg, b_max), axis=1)
         v = tf.layers.dense(v, 512, activation='tanh')
