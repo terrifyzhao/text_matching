@@ -107,5 +107,6 @@ venv.bak/
 
 .DS_Store
 
-/output/dssm/
-/output/esim/
+output/dssm/
+output/esim/
+
