@@ -8,8 +8,8 @@ import tensorflow as tf
 from utils.load_data import load_data
 from esim import args
 
-p, h, y = load_data('input/train.csv', data_size=1000)
-p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=100)
+p, h, y = load_data('input/train.csv', data_size=None)
+p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=None)
 
 p_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
 h_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
