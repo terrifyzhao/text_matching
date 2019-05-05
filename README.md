@@ -5,10 +5,10 @@
 
 数据集为QA_corpus，训练数据10w条，验证集和测试集均为1w条
 
-训练方法：
+训练：
 `python train.py`
 
-测试方法：
+测试：
 `python test.py`
 
 其中对应模型文件夹下的`args.py`文件是超参数
