@@ -53,4 +53,5 @@ with tf.Session(config=config)as sess:
             last_loss = loss_eval
         if loss_eval > last_loss:
             break
+        last_loss = loss_eval
         saver.save(sess, f'../output/convnet/convnet_{epoch}.ckpt')

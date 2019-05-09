@@ -11,14 +11,14 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
-p, h, y = load_data('input/test.csv', data_size=None)
+p, h, y = load_data('ccb/test.csv', data_size=1000)
 
 model = Graph()
 saver = tf.train.Saver()
 
 with tf.Session()as sess:
     sess.run(tf.global_variables_initializer())
-    saver.restore(sess, '../output/esim/esim_9.ckpt')
+    saver.restore(sess, '../output/esim/esim_12.ckpt')
     loss, acc = sess.run([model.loss, model.acc],
                          feed_dict={model.p: p,
                                     model.h: h,

@@ -41,3 +41,6 @@ def load_data(file, data_size=None):
     p_index, h_index = seq_index(p, h)
 
     return p_index, h_index, label
+
+
+

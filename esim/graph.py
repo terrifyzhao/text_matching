@@ -41,7 +41,7 @@ class Graph:
 
         e = tf.matmul(p, tf.transpose(h, perm=[0, 2, 1]))
         a_attention = tf.nn.softmax(e)
-        b_attention = tf.transpose(tf.nn.softmax(tf.transpose(e)))
+        b_attention = tf.transpose(tf.nn.softmax(tf.transpose(e, perm=[0, 2, 1])), perm=[0, 2, 1])
 
         a = tf.matmul(a_attention, h)
         b = tf.matmul(b_attention, p)
@@ -70,7 +70,8 @@ class Graph:
         v = tf.layers.dense(v, 512, activation='tanh')
         v = self.dropout(v)
         logits = tf.layers.dense(v, 2, activation='tanh')
-
+        self.prob = tf.nn.softmax(logits)
+        self.prediction = tf.argmax(logits, axis=1)
         self.train(logits)
 
     def train(self, logits):
@@ -78,6 +79,5 @@ class Graph:
         loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=logits)
         self.loss = tf.reduce_mean(loss)
         self.train_op = tf.train.AdamOptimizer(args.learning_rate).minimize(self.loss)
-        prediction = tf.argmax(logits, axis=1)
-        correct_prediction = tf.equal(tf.cast(prediction, tf.int32), self.y)
+        correct_prediction = tf.equal(tf.cast(self.prediction, tf.int32), self.y)
         self.acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
