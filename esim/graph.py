@@ -46,8 +46,8 @@ class Graph:
         a = tf.matmul(a_attention, h)
         b = tf.matmul(b_attention, p)
 
-        m_a = tf.concat((a, p, a - p, a * p), axis=2)
-        m_b = tf.concat((b, h, b - h, b * h), axis=2)
+        m_a = tf.concat((a, p, a - p, tf.multiply(a, p)), axis=2)
+        m_b = tf.concat((b, h, b - h, tf.multiply(b, h)), axis=2)
 
         with tf.variable_scope("lstm_a", reuse=tf.AUTO_REUSE):
             (a_f, a_b), _ = self.bilstm(m_a, args.context_hidden_size)
