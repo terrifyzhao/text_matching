@@ -20,16 +20,13 @@ dataset = dataset.batch(args.batch_size).repeat(args.epochs)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
-model = Graph()
+# model = Graph(False, False)
+model = Graph(False, True)
 saver = tf.train.Saver()
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 1
-
-import numpy as np
-padding = np.array([[[0 for _ in range(100)] for _ in range(2)] for _ in range(args.batch_size)])
-eval_padding = np.array([[[0 for _ in range(100)] for _ in range(2)] for _ in range(len(y_eval))])
 
 with tf.Session(config=config)as sess:
     sess.run(tf.global_variables_initializer())
@@ -43,7 +40,6 @@ with tf.Session(config=config)as sess:
                                     feed_dict={model.p: p_batch,
                                                model.h: h_batch,
                                                model.y: y_batch,
-                                               model.padding: padding,
                                                model.keep_prob: args.keep_prob})
             print('epoch:', epoch, ' step:', step, ' loss: ', loss, ' acc:', acc)
 
@@ -51,7 +47,6 @@ with tf.Session(config=config)as sess:
                                        feed_dict={model.p: p_eval,
                                                   model.h: h_eval,
                                                   model.y: y_eval,
-                                                  model.padding: eval_padding,
                                                   model.keep_prob: 1})
         print('loss_eval: ', loss_eval, ' acc_eval:', acc_eval)
         print('\n')

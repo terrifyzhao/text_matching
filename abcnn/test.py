@@ -18,7 +18,7 @@ saver = tf.train.Saver()
 
 with tf.Session()as sess:
     sess.run(tf.global_variables_initializer())
-    saver.restore(sess, '../output/convnet/convnet_7.ckpt')
+    saver.restore(sess, '../output/abcnn/abcnn_43.ckpt')
     loss, acc = sess.run([model.loss, model.acc],
                          feed_dict={model.p: p,
                                     model.h: h,
