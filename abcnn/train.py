@@ -21,7 +21,7 @@ iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
 # model = Graph(False, False)
-model = Graph(False, True)
+model = Graph(True, True)
 saver = tf.train.Saver()
 
 config = tf.ConfigProto()

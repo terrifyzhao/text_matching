@@ -13,12 +13,12 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 
 p, h, y = load_data('input/test.csv', data_size=None)
 
-model = Graph()
+model = Graph(True, True)
 saver = tf.train.Saver()
 
 with tf.Session()as sess:
     sess.run(tf.global_variables_initializer())
-    saver.restore(sess, '../output/abcnn/abcnn_43.ckpt')
+    saver.restore(sess, '../output/abcnn/abcnn_23.ckpt')
     loss, acc = sess.run([model.loss, model.acc],
                          feed_dict={model.p: p,
                                     model.h: h,
