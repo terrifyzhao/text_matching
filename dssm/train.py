@@ -31,7 +31,6 @@ with tf.Session(config=config)as sess:
     sess.run(tf.global_variables_initializer())
     sess.run(iterator.initializer, feed_dict={p_holder: p, h_holder: h, y_holder: y})
     steps = int(len(y) / args.batch_size)
-    last_loss = 0
     for epoch in range(args.epochs):
         for step in range(steps):
             p_batch, h_batch, y_batch = sess.run(next_element)
@@ -49,9 +48,4 @@ with tf.Session(config=config)as sess:
                                                   model.keep_prob: 1})
         print('loss_eval: ', loss_eval, ' acc_eval:', acc_eval)
         print('\n')
-        if epoch == 0:
-            last_loss = loss_eval
-        if loss_eval > last_loss:
-            break
-        last_loss = loss_eval
         saver.save(sess, f'../output/dssm/dssm_{epoch}.ckpt')
