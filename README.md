@@ -21,4 +21,4 @@ DSSM | 0.7613157 | 0.6864 | [DSSM](https://posenhuang.github.io/papers/cikm2013_
 ConvNet | 0.6872447 | 0.6977 | [ConvNet](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.723.6492&rep=rep1&type=pdf) |
 ESIM | 0.55444807| 0.736 | [ESIM](https://arxiv.org/pdf/1609.06038.pdf) |
 ABCNN | 0.5771452| 0.7503 | [ABCNN](https://arxiv.org/pdf/1512.05193.pdf) |
-BiMPM | 0.0| 0.0 | [BiMPM](https://arxiv.org/pdf/1702.03814.pdf) |
+BiMPM | 0.4852| 0.764 | [BiMPM](https://arxiv.org/pdf/1702.03814.pdf) |

@@ -10,11 +10,11 @@ class_size = 2
 max_char_len = 15
 max_word_len = 15
 
-batch_size = 100
+batch_size = 150
 
 char_vocab_len = 1692
 
-learning_rate = 0.01
+learning_rate = 0.0002
 
 keep_prob = 0.7
 

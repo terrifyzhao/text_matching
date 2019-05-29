@@ -1,11 +1,17 @@
-from BiMPM import Graph
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+
+from bimpm.graph import Graph
 import tensorflow as tf
-import args
-from data_process import load_data
+from bimpm import args
+from utils.load_data_for_bimpm import load_data
 import numpy as np
 
-p_index, h_index, p_vec, h_vec, label = load_data('input/test.csv')
-p_index_dev, h_index_dev, p_vec_dev, h_vec_dev, label_dev = load_data('input/dev.csv')
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
+p_index, h_index, p_vec, h_vec, label = load_data('../input/test.csv')
 p_index_holder = tf.placeholder(name='p_index', shape=(None, args.max_char_len), dtype=tf.int32)
 h_index_holder = tf.placeholder(name='h_index', shape=(None, args.max_char_len), dtype=tf.int32)
 p_vec_holder = tf.placeholder(name='p_vec', shape=(None, args.max_word_len, args.word_embedding_len),
@@ -23,7 +29,7 @@ saver = tf.train.Saver()
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.8
+config.gpu_options.per_process_gpu_memory_fraction = 1
 
 with tf.Session(config=config)as sess:
     sess.run(tf.global_variables_initializer())
@@ -32,7 +38,7 @@ with tf.Session(config=config)as sess:
                                               p_vec_holder: p_vec,
                                               h_vec_holder: h_vec,
                                               label_holder: label})
-    saver.restore(sess, "/output/BiMPM_0.ckpt")
+    saver.restore(sess, "../output/bimpm/BiMPM_10.ckpt")
     steps = int(len(label) / args.batch_size)
     loss_all = []
     acc_all = []

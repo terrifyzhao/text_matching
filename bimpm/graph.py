@@ -2,7 +2,7 @@ import tensorflow as tf
 from bimpm import args
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
 class Graph:
@@ -43,7 +43,7 @@ class Graph:
 
         m = tf.matmul(metric, tf.transpose(vec, [0, 1, 3, 2]))
         n = tf.norm(metric, axis=3, keep_dims=True) * tf.norm(vec, axis=3, keep_dims=True)
-        cosine = tf.transpose(m / n, [0, 2, 3, 1])
+        cosine = tf.transpose(tf.divide(m, n), [0, 2, 3, 1])
 
         return cosine
 
@@ -55,7 +55,8 @@ class Graph:
     def cosine(self, v1, v2):
         m = tf.matmul(v1, tf.transpose(v2, [0, 2, 1]))
         n = tf.norm(v1, axis=2, keep_dims=True) * tf.norm(v2, axis=2, keep_dims=True)
-        cosine = m / n
+        # cosine = m / n
+        cosine = tf.divide(m, n)
         return cosine
 
     def dropout(self, x):
@@ -74,6 +75,9 @@ class Graph:
         # 字向量和词向量拼接起来
         p_embedding = tf.concat((p_output, self.p_vec), axis=-1)
         h_embedding = tf.concat((h_output, self.h_vec), axis=-1)
+
+        # p_embedding = p_output
+        # h_embedding = h_output
 
         p_embedding = self.dropout(p_embedding)
         h_embedding = self.dropout(h_embedding)
@@ -112,10 +116,10 @@ class Graph:
         h_att_fw = tf.matmul(fw_cos, h_fw)
         h_att_bw = tf.matmul(bw_cos, h_bw)
 
-        p_mean_fw = p_att_fw / tf.reduce_sum(fw_cos, axis=2, keep_dims=True)
-        p_mean_bw = p_att_bw / tf.reduce_sum(bw_cos, axis=2, keep_dims=True)
-        h_mean_fw = h_att_fw / tf.reduce_sum(fw_cos, axis=2, keep_dims=True)
-        h_mean_bw = h_att_bw / tf.reduce_sum(fw_cos, axis=2, keep_dims=True)
+        p_mean_fw = tf.divide(p_att_fw, tf.reduce_sum(fw_cos, axis=2, keep_dims=True))
+        p_mean_bw = tf.divide(p_att_bw, tf.reduce_sum(bw_cos, axis=2, keep_dims=True))
+        h_mean_fw = tf.divide(h_att_fw, tf.reduce_sum(fw_cos, axis=2, keep_dims=True))
+        h_mean_bw = tf.divide(h_att_bw, tf.reduce_sum(fw_cos, axis=2, keep_dims=True))
 
         p_att_mean_fw = self.full_matching(p_fw, p_mean_fw, self.w5)
         p_att_mean_bw = self.full_matching(p_bw, p_mean_bw, self.w6)
@@ -159,13 +163,18 @@ class Graph:
         x = tf.reshape(x, shape=[-1, x.shape[1] * x.shape[2]])
         x = self.dropout(x)
 
+        # mv_p = tf.reshape(mv_p, [-1, mv_p.shape[1] * mv_p.shape[2] * mv_p.shape[3]])
+        # mv_h = tf.reshape(mv_h, [-1, mv_h.shape[1] * mv_h.shape[2] * mv_h.shape[3]])
+        # x = tf.concat((mv_p, mv_h), axis=1)
+
         # ----- Prediction Layer -----
         # x = tf.layers.dense(x, 20000, activation='relu')
         # x = self.dropout(x)
-        x = tf.layers.dense(x, 10000, activation='relu')
+        x = tf.layers.dense(x, 10000, activation='tanh')
         x = self.dropout(x)
-        x = tf.layers.dense(x, 512, activation='relu')
-        x = self.dropout(x)
+        x = tf.layers.dense(x, 512)
+        # x = self.dropout(x)
+        self.tmp = x
         self.logits = tf.layers.dense(x, args.class_size)
 
     def train(self):

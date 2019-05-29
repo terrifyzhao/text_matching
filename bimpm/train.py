@@ -41,13 +41,14 @@ with tf.Session(config=config)as sess:
         for step in range(steps):
             try:
                 p_index_batch, h_index_batch, p_vec_batch, h_vec_batch, label_batch = sess.run(next_element)
-                loss, _, predict, acc = sess.run([model.loss, model.train_op, model.predict, model.accuracy],
-                                                 feed_dict={model.p: p_index_batch,
-                                                            model.h: h_index_batch,
-                                                            model.p_vec: p_vec_batch,
-                                                            model.h_vec: h_vec_batch,
-                                                            model.y: label_batch,
-                                                            model.keep_prob: args.keep_prob})
+                loss, _, predict, acc, tmp = sess.run(
+                    [model.loss, model.train_op, model.predict, model.accuracy, model.tmp],
+                    feed_dict={model.p: p_index_batch,
+                               model.h: h_index_batch,
+                               model.p_vec: p_vec_batch,
+                               model.h_vec: h_vec_batch,
+                               model.y: label_batch,
+                               model.keep_prob: args.keep_prob})
                 print('epoch:', epoch, ' step:', step, ' loss:', loss / args.batch_size, ' acc:', acc)
             except tf.errors.OutOfRangeError:
                 print('\n')
