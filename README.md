@@ -22,5 +22,6 @@ ConvNet | 0.6872447 | 0.6977 | [ConvNet](http://citeseerx.ist.psu.edu/viewdoc/do
 ESIM | 0.55444807| 0.736 | [ESIM](https://arxiv.org/pdf/1609.06038.pdf) |
 ABCNN | 0.5771452| 0.7503 | [ABCNN](https://arxiv.org/pdf/1512.05193.pdf) |
 BiMPM | 0.4852| 0.764 | [BiMPM](https://arxiv.org/pdf/1702.03814.pdf) |
+DIIN | 0.48298636| 0.7694 | [DIIN](https://arxiv.org/pdf/1709.04348.pdf) |
 
 以上测试结果可能不是模型的最优解，超参的选择也不一定是最优的，如果你想用到自己的实际工程中，请自行调整超参
