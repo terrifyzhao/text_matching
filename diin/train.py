@@ -8,8 +8,8 @@ import tensorflow as tf
 from diin import args
 from utils.load_data_for_bimpm import load_data
 
-p_index, h_index, p_vec, h_vec, label = load_data('../input/train.csv', data_size=None)
-p_index_dev, h_index_dev, p_vec_dev, h_vec_dev, label_dev = load_data('../input/dev.csv', data_size=1000)
+p_index, h_index, p_vec, h_vec, label = load_data('../input/train.csv')
+p_index_dev, h_index_dev, p_vec_dev, h_vec_dev, label_dev = load_data('../input/dev.csv', data_size=2000)
 p_index_holder = tf.placeholder(name='p_index', shape=(None, args.max_char_len), dtype=tf.int32)
 h_index_holder = tf.placeholder(name='h_index', shape=(None, args.max_char_len), dtype=tf.int32)
 p_vec_holder = tf.placeholder(name='p_vec', shape=(None, args.max_word_len, args.word_embedding_len),
@@ -41,7 +41,7 @@ with tf.Session(config=config)as sess:
         for step in range(steps):
             try:
                 p_index_batch, h_index_batch, p_vec_batch, h_vec_batch, label_batch = sess.run(next_element)
-                loss, _, predict, acc, tmp = sess.run(
+                loss, _, predict, acc = sess.run(
                     [model.loss, model.train_op, model.predict, model.accuracy],
                     feed_dict={model.p: p_index_batch,
                                model.h: h_index_batch,
@@ -49,7 +49,7 @@ with tf.Session(config=config)as sess:
                                model.h_vec: h_vec_batch,
                                model.y: label_batch,
                                model.keep_prob: args.keep_prob})
-                print('epoch:', epoch, ' step:', step, ' loss:', loss / args.batch_size, ' acc:', acc)
+                print('epoch:', epoch, ' step:', step, ' loss:', loss, ' acc:', acc)
             except tf.errors.OutOfRangeError:
                 print('\n')
 

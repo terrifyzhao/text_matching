@@ -34,4 +34,5 @@ h_seg = list(map(lambda x: list(jieba.cut(x)), h))
 common_texts.extend(p_seg)
 common_texts.extend(h_seg)
 model = Word2Vec(common_texts, size=args.word_embedding_len, window=5, min_count=0, workers=12)
+
 model.save("../output/bimpm/word2vec.model")
