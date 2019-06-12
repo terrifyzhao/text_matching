@@ -24,14 +24,10 @@ import math
 import os
 import random
 import sys
-from tempfile import gettempdir
-import zipfile
 import pandas as pd
 import jieba
 
 import numpy as np
-from six.moves import urllib
-from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 import re
 
@@ -222,7 +218,7 @@ def word2vec_basic(log_dir):
 
         # Construct the SGD optimizer using a learning rate of 1.0.
         with tf.name_scope('optimizer'):
-            optimizer = tf.train.GradientDescentOptimizer(1.0).minimize(loss)
+            optimizer = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
 
         # Compute the cosine similarity between minibatch examples and all
         # embeddings.
@@ -254,7 +250,7 @@ def word2vec_basic(log_dir):
         print('Initialized')
 
         average_loss = 0
-        for step in xrange(num_steps):
+        for step in range(num_steps):
             batch_inputs, batch_labels = generate_batch(batch_size, num_skips,
                                                         skip_window)
             feed_dict = {train_inputs: batch_inputs, train_labels: batch_labels}
@@ -267,9 +263,9 @@ def word2vec_basic(log_dir):
             # Also, evaluate the merged op to get all summaries from the returned
             # "summary" variable. Feed metadata variable to session for visualizing
             # the graph in TensorBoard.
-            _, summary, loss_val = session.run([optimizer, merged, loss],
-                                               feed_dict=feed_dict,
-                                               run_metadata=run_metadata)
+            _, summary, loss_val, embedding = session.run([optimizer, merged, loss, embeddings],
+                                                          feed_dict=feed_dict,
+                                                          run_metadata=run_metadata)
             average_loss += loss_val
 
             # Add returned summaries to writer in each step.
@@ -289,24 +285,29 @@ def word2vec_basic(log_dir):
             # Note that this is expensive (~20% slowdown if computed every 500 steps)
             if step % 10000 == 0:
                 sim = similarity.eval()
-                for i in xrange(valid_size):
+                for i in range(valid_size):
                     valid_word = reverse_dictionary[valid_examples[i]]
                     top_k = 8  # number of nearest neighbors
                     nearest = (-sim[i, :]).argsort()[1:top_k + 1]
                     log_str = 'Nearest to %s:' % valid_word
-                    for k in xrange(top_k):
+                    for k in range(top_k):
                         close_word = reverse_dictionary[nearest[k]]
                         log_str = '%s %s,' % (log_str, close_word)
                     print(log_str)
         final_embeddings = normalized_embeddings.eval()
 
         # Write corresponding labels for the embeddings.
-        with open(log_dir + '/metadata.tsv', 'w', encoding='utf-8') as f:
-            for i in xrange(vocabulary_size):
+        with open(log_dir + '/word_vocab.tsv', 'w', encoding='utf-8') as f:
+            for i in range(vocabulary_size):
                 f.write(reverse_dictionary[i] + '\n')
 
         # Save the model for checkpoints.
         saver.save(session, os.path.join(log_dir, 'model.ckpt'))
+
+        with open(log_dir + '/w2v.vec', 'wb')as file:
+            import pickle
+            pickle.dump(embedding, file)
+            print('save w2v done')
 
         # Create a configuration for visualizing embeddings with the labels in
         # TensorBoard.
@@ -349,7 +350,7 @@ def word2vec_basic(log_dir):
             perplexity=30, n_components=2, init='pca', n_iter=5000, method='exact')
         plot_only = 500
         low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
-        labels = [reverse_dictionary[i] for i in xrange(plot_only)]
+        labels = [reverse_dictionary[i] for i in range(plot_only)]
         plot_with_labels(low_dim_embs, labels, os.path.join(log_dir,
                                                             'tsne.png'))
 
@@ -364,16 +365,7 @@ def word2vec_basic(log_dir):
 def main(unused_argv):
     # Give a folder path as an argument with '--log_dir' to save
     # TensorBoard summaries. Default is a log folder in current directory.
-    current_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--log_dir',
-        type=str,
-        default=os.path.join(current_path, 'log'),
-        help='The log directory for TensorBoard summaries.')
-    flags, unused_flags = parser.parse_known_args()
-    word2vec_basic(flags.log_dir)
+    word2vec_basic('output/word2vec')
 
 
 if __name__ == '__main__':
