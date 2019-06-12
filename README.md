@@ -13,6 +13,13 @@
 测试：
 `python test.py`
 
+词向量：
+如果是BiMPM模型，请执行
+`python word2vec_gensim.py`
+
+如果是diin或者drcn模型，请执行
+`python word2vec.py`
+
 测试集结果对比：
 
 模型 | loss | acc | 论文地址
