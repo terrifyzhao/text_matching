@@ -15,10 +15,10 @@
 
 词向量：
 如果是BiMPM模型，请执行
-`python word2vec_gensim.py`
+`python word2vec_gensim.py`，该版本是采用gensim来训练词向量
 
 如果是diin或者drcn模型，请执行
-`python word2vec.py`
+`python word2vec.py`，该版本是采用tensorflow来训练词向量，训练完成后会保存embedding矩阵、词典和词向量在二维矩阵的相对位置的图片，如果非win10环境，由于字体的原因图片可能保存失败
 
 测试集结果对比：
 

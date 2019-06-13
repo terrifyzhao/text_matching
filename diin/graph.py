@@ -6,19 +6,18 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
 class Graph:
-    def __init__(self, word_embed=None):
-        self.p = tf.placeholder(name='p', shape=(None, args.max_char_len), dtype=tf.int32)
-        self.h = tf.placeholder(name='h', shape=(None, args.max_char_len), dtype=tf.int32)
-        self.p_vec = tf.placeholder(name='p_word', shape=(None, args.max_word_len, args.word_embedding_len),
-                                    dtype=tf.float32)
-        self.h_vec = tf.placeholder(name='h_word', shape=(None, args.max_word_len, args.word_embedding_len),
-                                    dtype=tf.float32)
+    def __init__(self, word_embedding=None):
+        self.p_c = tf.placeholder(name='p', shape=(None, args.max_char_len), dtype=tf.int32)
+        self.h_c = tf.placeholder(name='h', shape=(None, args.max_char_len), dtype=tf.int32)
+        self.p_w = tf.placeholder(name='p_word', shape=(None, args.max_word_len), dtype=tf.int32)
+        self.h_w = tf.placeholder(name='h_word', shape=(None, args.max_word_len), dtype=tf.int32)
         self.y = tf.placeholder(name='y', shape=(None,), dtype=tf.int32)
         self.keep_prob = tf.placeholder(name='keep_prob', dtype=tf.float32)
 
         self.char_embed = tf.get_variable(name='char_embed', shape=(args.char_vocab_len, args.char_embedding_len),
                                           dtype=tf.float32)
-        # self.word_embed = tf.get_variable(name='word_embed', initializer=word_embed, dtype=tf.float32, trainable=True)
+        self.word_embed = tf.get_variable(name='word_embed', initializer=word_embedding, dtype=tf.float32,
+                                          trainable=False)
 
         self.self_w = tf.get_variable(name='self_w', shape=(args.d * 3, 30))
         self.gate_w1 = tf.get_variable(name='gate_w1', shape=(args.d * 2, args.d))
@@ -65,11 +64,14 @@ class Graph:
         return v_in
 
     def forward(self):
-        p_char_embedding = tf.nn.embedding_lookup(self.char_embed, self.p)
-        h_char_embedding = tf.nn.embedding_lookup(self.char_embed, self.h)
+        p_char_embedding = tf.nn.embedding_lookup(self.char_embed, self.p_c)
+        h_char_embedding = tf.nn.embedding_lookup(self.char_embed, self.h_c)
 
-        p = tf.concat((p_char_embedding, self.p_vec), axis=1)
-        h = tf.concat((h_char_embedding, self.h_vec), axis=1)
+        p_word_embedding = tf.nn.embedding_lookup(self.word_embed, self.p_w)
+        h_word_embedding = tf.nn.embedding_lookup(self.word_embed, self.h_w)
+
+        p = tf.concat((p_char_embedding, p_word_embedding), axis=1)
+        h = tf.concat((h_char_embedding, h_word_embedding), axis=1)
 
         # Encoding Layer
         with tf.variable_scope('p_encode', reuse=None):

@@ -40,9 +40,12 @@ data_num = 0
 def word2vec_basic(log_dir):
     def load_data():
 
-        df = pd.read_csv('input/origin_5_16.csv', encoding='utf-8-sig')
-        df2 = pd.read_csv('input/query_5_16.csv', encoding='utf-8-sig')
-        df_sentences = np.concatenate([df['sentence'].values, df2['sentence'].values])
+        df1 = pd.read_csv('input/train.csv', encoding='utf-8-sig')
+        df2 = pd.read_csv('input/dev.csv', encoding='utf-8-sig')
+        df3 = pd.read_csv('input/test.csv', encoding='utf-8-sig')
+        df_sentences = np.concatenate([df1['sentence1'].values, df1['sentence2'].values,
+                                       df2['sentence1'].values, df2['sentence2'].values,
+                                       df3['sentence1'].values, df3['sentence2'].values])
         segments = list(
             map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), df_sentences))
 
@@ -159,7 +162,7 @@ def word2vec_basic(log_dir):
     # Step 4: Build and train a skip-gram model.
 
     batch_size = 256
-    embedding_size = 128  # Dimension of the embedding vector.
+    embedding_size = 100  # Dimension of the embedding vector.
     skip_window = 1  # How many words to consider left and right.
     num_skips = 2  # How many times to reuse an input to generate a label.
     num_sampled = 64  # Number of negative examples to sample.

@@ -4,7 +4,8 @@ from bimpm import args
 import numpy as np
 from gensim.models import Word2Vec
 import jieba
-from utils.data_utils import pad_sequences, shuffle
+from utils.data_utils import pad_sequences, shuffle, one_hot
+import re
 
 model = Word2Vec.load('../output/bimpm/word2vec.model')
 
@@ -34,8 +35,26 @@ def create_data(p_sentences, h_sentences):
     return p_list, h_list
 
 
-def w2v(word):
-    return model.wv[word]
+def w2v(word, dynamic=True):
+    if dynamic:
+        vocab = []
+        # with open('../out/word2vec/w2v.vec')as file:
+        #     import pickle
+        #     embedding = pickle.load(file)
+        with open('../output/word2vec/word_vocab.tsv', encoding='utf-8')as file:
+            for line in file.readlines():
+                vocab.append(line.strip())
+
+        # one = one_hot(vocab.index(word), len(vocab))
+        # one = []
+        index = []
+        for w in word:
+            if len(w.strip()) > 0 and w != '\u200d':
+                index.append(vocab.index(w))
+
+        return one_hot(index, len(vocab))
+    else:
+        return model.wv[word]
 
 
 def w2v_process(vec):
@@ -49,7 +68,7 @@ def w2v_process(vec):
     return vec
 
 
-def load_data(file, data_size=None):
+def load_data(file, data_size=None, dynamic=True):
     path = os.path.join(os.path.dirname(__file__), file)
     df = pd.read_csv(path)
     p = df['sentence1'].values[0:data_size]
@@ -60,14 +79,17 @@ def load_data(file, data_size=None):
 
     p_index, h_index = create_data(p, h)
 
-    p_seg = map(lambda x: list(jieba.cut(x)), p)
-    h_seg = map(lambda x: list(jieba.cut(x)), h)
+    p_seg = map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), p)
+    h_seg = map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), h)
+    # p_seg = map(lambda x: list(jieba.cut(x)), p)
+    # h_seg = map(lambda x: list(jieba.cut(x)), h)
 
-    p_vec = map(lambda x: w2v(x), p_seg)
-    h_vec = map(lambda x: w2v(x), h_seg)
+    p_vec = list(map(lambda x: w2v(x, dynamic), p_seg))
+    h_vec = list(map(lambda x: w2v(x, dynamic), h_seg))
 
-    p_vec = np.array(list(map(lambda x: w2v_process(x), p_vec)))
-    h_vec = np.array(list(map(lambda x: w2v_process(x), h_vec)))
+    # if not dynamic:
+    # p_vec = np.array(list(map(lambda x: w2v_process(x), p_vec)))
+    # h_vec = np.array(list(map(lambda x: w2v_process(x), h_vec)))
 
     return p_index, h_index, p_vec, h_vec, label
 

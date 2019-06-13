@@ -43,8 +43,8 @@ with tf.Session(config=config)as sess:
                 p_index_batch, h_index_batch, p_vec_batch, h_vec_batch, label_batch = sess.run(next_element)
                 loss, _, predict, acc, tmp = sess.run(
                     [model.loss, model.train_op, model.predict, model.accuracy],
-                    feed_dict={model.p: p_index_batch,
-                               model.h: h_index_batch,
+                    feed_dict={model.p_c: p_index_batch,
+                               model.h_c: h_index_batch,
                                model.p_vec: p_vec_batch,
                                model.h_vec: h_vec_batch,
                                model.y: label_batch,
@@ -54,8 +54,8 @@ with tf.Session(config=config)as sess:
                 print('\n')
 
         predict, acc = sess.run([model.predict, model.accuracy],
-                                feed_dict={model.p: p_index_dev,
-                                           model.h: h_index_dev,
+                                feed_dict={model.p_c: p_index_dev,
+                                           model.h_c: h_index_dev,
                                            model.p_vec: p_vec_dev,
                                            model.h_vec: h_vec_dev,
                                            model.y: label_dev,
