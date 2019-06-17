@@ -29,7 +29,10 @@ def load_word_vocab():
 
 # 静态w2v
 def w2v(word, model):
-    return model.wv[word]
+    try:
+        return model.wv[word]
+    except:
+        return np.zeros(args.word_embedding_len)
 
 
 # 字->index
@@ -151,19 +154,39 @@ def load_all_data(path, data_size=None):
 
     p_c_index, h_c_index = char_index(p, h)
 
-    p_seg = map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), p)
-    h_seg = map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), h)
+    p_seg = list(map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), p))
+    h_seg = list(map(lambda x: list(jieba.cut(re.sub("[！，。？、~@#￥%&*（）.,:：|/`()_;+；…\\\\\\-\\s]", "", x))), h))
 
     p_w_index, h_w_index = word_index(p_seg, h_seg)
+
+    p_seg = map(lambda x: list(jieba.cut(x)), p)
+    h_seg = map(lambda x: list(jieba.cut(x)), h)
 
     p_w_vec = list(map(lambda x: w2v(x, model), p_seg))
     h_w_vec = list(map(lambda x: w2v(x, model), h_seg))
 
-    p_w_vec = pad_sequences(p_w_vec, maxlen=args.seq_length)
-    h_w_vec = pad_sequences(h_w_vec, maxlen=args.seq_length)
+    p_w_vec = list(map(lambda x: w2v_process(x), p_w_vec))
+    h_w_vec = list(map(lambda x: w2v_process(x), h_w_vec))
 
-    return p_c_index, h_c_index, p_w_index, h_w_index, p_w_vec, h_w_vec, label
+    # 判断是否有相同的词
+    same_word = []
+    for p_i, h_i in zip(p_w_index, h_w_index):
+        dic = {}
+        for i in p_i:
+            if i == 0:
+                break
+            dic[i] = dic.get(i, 0) + 1
+        for i in h_i:
+            if i == 0:
+                same_word.append(0)
+                break
+            dic[i] = dic.get(i, 0) - 1
+            if dic[i] == 0:
+                same_word.append(1)
+                break
+
+    return p_c_index, h_c_index, p_w_index, h_w_index, p_w_vec, h_w_vec, same_word, label
 
 
 if __name__ == '__main__':
-    load_char_word_dynamic_data('../input/train.csv')
+    load_all_data('../input/train.csv', data_size=100)

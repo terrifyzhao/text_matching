@@ -1,8 +1,5 @@
-import pickle
+import numpy as np
 
-with open('output/w2v.vec', 'rb')as file:
-    embedding = pickle.load(file)
-
-
-
-print(123)
+a = np.array([1, 2, 3,4])
+b = np.array([1, 2, 0])
+print(a ^ b)
