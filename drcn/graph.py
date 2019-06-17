@@ -41,8 +41,8 @@ class Graph:
         h_char_embedding = tf.nn.embedding_lookup(self.char_embed, self.h_c_index)
 
         # 动态词向量
-        p_word_embedding = tf.nn.embedding_lookup(self.char_embed, self.p_w_index)
-        h_word_embedding = tf.nn.embedding_lookup(self.char_embed, self.h_w_index)
+        p_word_embedding = tf.nn.embedding_lookup(self.word_embed, self.p_w_index)
+        h_word_embedding = tf.nn.embedding_lookup(self.word_embed, self.h_w_index)
 
         same_word = tf.expand_dims(tf.expand_dims(self.same_word, axis=-1), axis=-1)
         same_word = tf.tile(same_word, [1, 15, 1])

@@ -10,9 +10,9 @@ from utils.load_data import load_all_data
 import pickle
 
 p_c_index, h_c_index, p_w_index, h_w_index, p_w_vec, h_w_vec, same_word, label = load_all_data('../input/train.csv',
-                                                                                               data_size=100)
+                                                                                               data_size=None)
 p_c_index_evl, h_c_index_evl, p_w_index_evl, h_w_index_evl, p_w_vec_evl, h_w_vec_evl, same_word_evl, label_evl = load_all_data(
-    '../input/dev.csv', data_size=200)
+    '../input/dev.csv', data_size=2000)
 
 p_c_index_holder = tf.placeholder(name='p_c_index', shape=(None, args.max_char_len), dtype=tf.int32)
 h_c_index_holder = tf.placeholder(name='h_c_index', shape=(None, args.max_char_len), dtype=tf.int32)
@@ -71,7 +71,8 @@ with tf.Session(config=config)as sess:
                                model.keep_prob_fully: args.keep_prob_fully,
                                model.keep_prob_ae: args.keep_prob_ae,
                                model.bn_training: True})
-                print('epoch:', epoch, ' step:', step, ' loss:', loss, ' acc:', acc)
+                if step % 50 == 0 or step == steps - 1:
+                    print('epoch:', epoch, ' step:', step, ' loss:', loss, ' acc:', acc)
             except tf.errors.OutOfRangeError:
                 print('\n')
 
@@ -88,7 +89,7 @@ with tf.Session(config=config)as sess:
                                            model.keep_prob_fully: 1,
                                            model.keep_prob_ae: 1,
                                            model.bn_training: False})
-        print('epoch:', epoch, ' dev acc:', acc)
-        saver.save(sess, f'../output/diin/diin_{epoch}.ckpt')
+        print('epoch:', epoch, ' dev acc:', acc, ' loss:', loss)
+        saver.save(sess, f'../output/drcn/drcn{epoch}.ckpt')
         print('save model done')
         print('\n')

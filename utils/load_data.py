@@ -176,7 +176,7 @@ def load_all_data(path, data_size=None):
             if i == 0:
                 break
             dic[i] = dic.get(i, 0) + 1
-        for i in h_i:
+        for index, i in enumerate(h_i):
             if i == 0:
                 same_word.append(0)
                 break
@@ -184,6 +184,8 @@ def load_all_data(path, data_size=None):
             if dic[i] == 0:
                 same_word.append(1)
                 break
+            if index == len(h_i) - 1:
+                same_word.append(0)
 
     return p_c_index, h_c_index, p_w_index, h_w_index, p_w_vec, h_w_vec, same_word, label
 

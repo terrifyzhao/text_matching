@@ -5,7 +5,7 @@ word_embedding_len = 100
 max_char_len = 15
 max_word_len = 15
 
-batch_size = 10
+batch_size = 1000
 
 char_vocab_len = 1692
 
