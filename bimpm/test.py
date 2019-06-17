@@ -6,12 +6,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from bimpm.graph import Graph
 import tensorflow as tf
 from bimpm import args
-from utils.load_data_for_bimpm import load_data
+from utils.load_data import load_char_word_static_data
 import numpy as np
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
-p_index, h_index, p_vec, h_vec, label = load_data('../input/test.csv')
+p_index, h_index, p_vec, h_vec, label = load_char_word_static_data('../input/test.csv')
 p_index_holder = tf.placeholder(name='p_index', shape=(None, args.max_char_len), dtype=tf.int32)
 h_index_holder = tf.placeholder(name='h_index', shape=(None, args.max_char_len), dtype=tf.int32)
 p_vec_holder = tf.placeholder(name='p_vec', shape=(None, args.max_word_len, args.word_embedding_len),

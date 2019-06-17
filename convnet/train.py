@@ -5,11 +5,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 from convnet.graph import Graph
 import tensorflow as tf
-from utils.load_data import load_data
+from utils.load_data import load_char_data
 from convnet import args
 
-p, h, y = load_data('input/train.csv', data_size=None)
-p_eval, h_eval, y_eval = load_data('input/dev.csv', data_size=args.batch_size)
+p, h, y = load_char_data('input/train.csv', data_size=None)
+p_eval, h_eval, y_eval = load_char_data('input/dev.csv', data_size=args.batch_size)
 
 p_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
 h_holder = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')

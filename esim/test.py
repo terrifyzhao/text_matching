@@ -5,13 +5,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 from esim.graph import Graph
 import tensorflow as tf
-from utils.load_data import load_data
+from utils.load_data import load_char_data
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
-p, h, y = load_data('ccb/test.csv', data_size=1000)
+p, h, y = load_char_data('ccb/test.csv', data_size=1000)
 
 model = Graph()
 saver = tf.train.Saver()

@@ -5,11 +5,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 from dssm.graph import Graph
 import tensorflow as tf
-from utils.load_data import load_data
+from utils.load_data import load_char_data
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-p, h, y = load_data('input/test.csv', data_size=None)
+p, h, y = load_char_data('input/test.csv', data_size=None)
 
 model = Graph()
 saver = tf.train.Saver()

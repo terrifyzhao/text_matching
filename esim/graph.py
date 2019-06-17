@@ -19,8 +19,8 @@ class Graph:
         return tf.nn.dropout(x, keep_prob=self.keep_prob)
 
     def bilstm(self, x, hidden_size):
-        fw_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_size, activation='tanh')
-        bw_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_size, activation='tanh')
+        fw_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_size)
+        bw_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_size)
 
         return tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell, x, dtype=tf.float32)
 
