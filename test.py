@@ -1,7 +1,7 @@
 import pandas as pd
 from esim.graph import Graph
 import tensorflow as tf
-from utils.load_data import seq_index
+from utils.load_data import char_index
 import os
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '2'
@@ -43,7 +43,7 @@ def predict(p, h):
 def test():
     for value, index in zip(sens, indexs):
         sen = [value] * len(data)
-        s1, s2 = seq_index(sen, data_sen)
+        s1, s2 = char_index(sen, data_sen)
         predict_index = predict(s1, s2)
         d = data.values[predict_index]
         # t = test_data.values[index]
@@ -55,13 +55,13 @@ def test():
 def test2():
     for value, index in zip(sens, indexs):
         sen = [value] * len(data)
-        s1, s2 = seq_index(sen, data_sen)
+        s1, s2 = char_index(sen, data_sen)
         probs = []
         for i, j in zip(s1, s2):
             prob = predict([i], [j])
             probs.append(prob[0][1])
 
-        print(len(probs),probs)
+        print(len(probs), probs)
         predict_index = probs.index(max(probs))
         print(max(probs))
 
@@ -74,10 +74,9 @@ def test3():
     while True:
         sen1 = input('sen1:')
         sen2 = input('sen2:')
-        s1, s2 = seq_index([sen1], [sen2])
+        s1, s2 = char_index([sen1], [sen2])
         print(predict(s1, s2))
 
 
 if __name__ == '__main__':
     test2()
-
