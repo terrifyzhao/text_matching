@@ -27,13 +27,13 @@ class Graph:
         self.train()
 
     def BiLSTM(self, x):
-        fw_cell = tf.nn.rnn_cell.BasicLSTMCell(args.char_hidden_size, activation='tanh')
-        bw_cell = tf.nn.rnn_cell.BasicLSTMCell(args.char_hidden_size, activation='tanh')
+        fw_cell = tf.nn.rnn_cell.BasicLSTMCell(args.char_hidden_size)
+        bw_cell = tf.nn.rnn_cell.BasicLSTMCell(args.char_hidden_size)
 
         return tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell, x, dtype=tf.float32)
 
     def LSTM(self, x):
-        cell = tf.nn.rnn_cell.BasicLSTMCell(args.char_hidden_size, activation='tanh')
+        cell = tf.nn.rnn_cell.BasicLSTMCell(args.char_hidden_size)
         return tf.nn.dynamic_rnn(cell, x, dtype=tf.float32)
 
     def full_matching(self, metric, vec, w):
