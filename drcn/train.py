@@ -35,7 +35,7 @@ next_element = iterator.get_next()
 with open('../output/word2vec/w2v.vec', 'rb')as file:
     embedding = pickle.load(file)
 model = Graph(word_embedding=embedding)
-saver = tf.train.Saver(max_to_keep=10)
+saver = tf.train.Saver(max_to_keep=50)
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -53,12 +53,13 @@ with tf.Session(config=config)as sess:
                                               label_holder: label})
     steps = int(len(label) / args.batch_size)
     for epoch in range(args.epochs):
+        embedding_train = None
         for step in range(steps):
             try:
                 p_c_index_batch, h_c_index_batch, p_w_index_batch, h_w_index_batch, p_w_vec_batch, h_w_vec_batch, same_word_batch, label_batch = sess.run(
                     next_element)
-                loss, _, predict, acc = sess.run(
-                    [model.loss, model.train_op, model.predict, model.accuracy],
+                loss, _, predict, acc, embedding_train = sess.run(
+                    [model.loss, model.train_op, model.predict, model.accuracy, model.word_embed],
                     feed_dict={model.p_c_index: p_c_index_batch,
                                model.h_c_index: h_c_index_batch,
                                model.p_w_index: p_w_index_batch,
@@ -76,20 +77,23 @@ with tf.Session(config=config)as sess:
             except tf.errors.OutOfRangeError:
                 print('\n')
 
-        predict, acc = sess.run([model.predict, model.accuracy],
-                                feed_dict={model.p_c_index: p_c_index_evl,
-                                           model.h_c_index: h_c_index_evl,
-                                           model.p_w_index: p_w_index_evl,
-                                           model.h_w_index: h_w_index_evl,
-                                           model.p_w_vec: p_w_vec_evl,
-                                           model.h_w_vec: h_w_vec_evl,
-                                           model.same_word: same_word_evl,
-                                           model.y: label_evl,
-                                           model.keep_prob_embed: 1,
-                                           model.keep_prob_fully: 1,
-                                           model.keep_prob_ae: 1,
-                                           model.bn_training: False})
+        predict, acc, loss = sess.run([model.predict, model.accuracy, model.loss],
+                                      feed_dict={model.p_c_index: p_c_index_evl,
+                                                 model.h_c_index: h_c_index_evl,
+                                                 model.p_w_index: p_w_index_evl,
+                                                 model.h_w_index: h_w_index_evl,
+                                                 model.p_w_vec: p_w_vec_evl,
+                                                 model.h_w_vec: h_w_vec_evl,
+                                                 model.same_word: same_word_evl,
+                                                 model.y: label_evl,
+                                                 model.keep_prob_embed: 1,
+                                                 model.keep_prob_fully: 1,
+                                                 model.keep_prob_ae: 1,
+                                                 model.bn_training: False})
         print('epoch:', epoch, ' dev acc:', acc, ' loss:', loss)
         saver.save(sess, f'../output/drcn/drcn{epoch}.ckpt')
+        with open('../output/drcn/w2v.vec', 'wb')as file:
+            pickle.dump(embedding_train, file)
+            print('save w2v done')
         print('save model done')
         print('\n')

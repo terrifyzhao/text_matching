@@ -32,7 +32,7 @@ dataset = dataset.batch(args.batch_size).repeat(args.epochs)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
-with open('../output/word2vec/w2v.vec', 'rb')as file:
+with open('../output/drcn/w2v.vec', 'rb')as file:
     embedding = pickle.load(file)
 model = Graph(word_embedding=embedding)
 saver = tf.train.Saver(max_to_keep=10)
@@ -51,7 +51,7 @@ with tf.Session(config=config)as sess:
                                               h_w_vec_holder: h_w_vec,
                                               same_word_holder: same_word,
                                               label_holder: label})
-    saver.restore(sess, "../output/drcn/drcn16.ckpt")
+    saver.restore(sess, "../output/drcn/drcn37.ckpt")
     steps = int(len(label) / args.batch_size)
     loss_all = []
     acc_all = []

@@ -42,6 +42,7 @@ with tf.Session(config=config)as sess:
                                               label_holder: label})
     steps = int(len(label) / args.batch_size)
     for epoch in range(args.epochs):
+        embedding_train = None
         for step in range(steps):
             try:
                 p_index_batch, h_index_batch, p_vec_batch, h_vec_batch, label_batch = sess.run(next_element)
