@@ -64,18 +64,18 @@ class Graph:
                 with tf.variable_scope(f'p_lstm_{i}_{j}' + str(i), reuse=None):
                     h_state, _ = self.BiLSTM(tf.concat(h_state, axis=-1))
 
-            p_state = tf.concat(p_state, axis=-1)
-            h_state = tf.concat(h_state, axis=-1)
-            # attention
-            cosine = tf.divide(tf.matmul(p_state, tf.matrix_transpose(h_state)),
-                               (tf.norm(p_state, axis=-1, keep_dims=True) * tf.norm(h_state, axis=-1, keep_dims=True)))
-            att_matrix = tf.nn.softmax(cosine)
-            p_attention = tf.matmul(att_matrix, h_state)
-            h_attention = tf.matmul(att_matrix, p_state)
+                p_state = tf.concat(p_state, axis=-1)
+                h_state = tf.concat(h_state, axis=-1)
+                # attention
+                cosine = tf.divide(tf.matmul(p_state, tf.matrix_transpose(h_state)),
+                                   (tf.norm(p_state, axis=-1, keep_dims=True) * tf.norm(h_state, axis=-1, keep_dims=True)))
+                att_matrix = tf.nn.softmax(cosine)
+                p_attention = tf.matmul(att_matrix, h_state)
+                h_attention = tf.matmul(att_matrix, p_state)
 
-            # DesNet
-            p = tf.concat((p, p_state, p_attention), axis=-1)
-            h = tf.concat((h, h_state, h_attention), axis=-1)
+                # DesNet
+                p = tf.concat((p, p_state, p_attention), axis=-1)
+                h = tf.concat((h, h_state, h_attention), axis=-1)
 
             # auto_encoder
             p = tf.layers.dense(p, 200)

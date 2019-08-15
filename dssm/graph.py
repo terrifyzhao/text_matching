@@ -7,6 +7,7 @@ class Graph:
         self.p = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
         self.h = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
         self.y = tf.placeholder(dtype=tf.int32, shape=None, name='y')
+
         self.keep_prob = tf.placeholder(dtype=tf.float32, name='drop_rate')
 
         self.embedding = tf.get_variable(dtype=tf.float32, shape=(args.vocab_size, args.char_embedding_size),
@@ -44,6 +45,7 @@ class Graph:
         p_context = self.fully_connect(p_embedding)
         h_context = self.fully_connect(h_embedding)
 
+        # [0,1],[1,0]  [0,0,1]...
         pos_result = self.cosine(p_context, h_context)
         neg_result = 1 - pos_result
 

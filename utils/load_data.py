@@ -92,6 +92,7 @@ def load_char_data(file, data_size=None):
 
     p, h, label = shuffle(p, h, label)
 
+    # [1,2,3,4,5] [4,1,5,2,0]
     p_c_index, h_c_index = char_index(p, h)
 
     return p_c_index, h_c_index, label
