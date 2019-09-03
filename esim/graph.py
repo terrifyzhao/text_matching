@@ -6,7 +6,9 @@ class Graph:
 
     def __init__(self):
         self.p = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='p')
+        self.p_mask = tf.cast(tf.math.equal(self.p, 0), tf.float32)
         self.h = tf.placeholder(dtype=tf.int32, shape=(None, args.seq_length), name='h')
+        self.h_mask = tf.cast(tf.math.equal(self.h, 0), tf.float32)
         self.y = tf.placeholder(dtype=tf.int32, shape=None, name='y')
         self.keep_prob = tf.placeholder(dtype=tf.float32, name='drop_rate')
 
@@ -40,8 +42,8 @@ class Graph:
         h = self.dropout(h)
 
         e = tf.matmul(p, tf.transpose(h, perm=[0, 2, 1]))
-        a_attention = tf.nn.softmax(e)
-        b_attention = tf.transpose(tf.nn.softmax(tf.transpose(e, perm=[0, 2, 1])), perm=[0, 2, 1])
+        a_attention = tf.nn.softmax(e + tf.tile(tf.expand_dims(self.h_mask*(-2**32 + 1),1), [1, tf.shape(e)[1],1]))#batch_size seq_len seq_len
+        b_attention = tf.nn.softmax(tf.transpose(e, perm=[0, 2, 1]) + tf.tile(tf.expand_dims(self.p_mask*(-2**32 + 1),1), [1, tf.shape(tf.transpose(e, perm=[0, 2, 1]))[1],1]))#
 
         a = tf.matmul(a_attention, h)
         b = tf.matmul(b_attention, p)
@@ -51,20 +53,20 @@ class Graph:
 
         with tf.variable_scope("lstm_a", reuse=tf.AUTO_REUSE):
             (a_f, a_b), _ = self.bilstm(m_a, args.context_hidden_size)
-        with tf.variable_scope("lstm_b", reuse=tf.AUTO_REUSE):
+        with tf.variable_scope("lstm_a", reuse=tf.AUTO_REUSE):
             (b_f, b_b), _ = self.bilstm(m_b, args.context_hidden_size)
 
-        a = tf.concat((a_f, a_b), axis=2)
-        b = tf.concat((b_f, b_b), axis=2)
+        a = tf.concat((a_f, a_b), axis=2)#batch_size seq_len 2*hidden_size
+        b = tf.concat((b_f, b_b), axis=2)#batch_size seq_len 2*hidden_size
 
         a = self.dropout(a)
         b = self.dropout(b)
 
-        a_avg = tf.reduce_mean(a, axis=2)
-        b_avg = tf.reduce_mean(b, axis=2)
+        a_avg = tf.reduce_mean(a, axis=1)#batch_size 2*hidden_size
+        b_avg = tf.reduce_mean(b, axis=1)#batch_size 2*hidden_size
 
-        a_max = tf.reduce_max(a, axis=2)
-        b_max = tf.reduce_max(b, axis=2)
+        a_max = tf.reduce_max(a, axis=1)#batch_size 2*hidden_size
+        b_max = tf.reduce_max(b, axis=1)#batch_size 2*hidden_size
 
         v = tf.concat((a_avg, a_max, b_avg, b_max), axis=1)
         v = tf.layers.dense(v, 512, activation='tanh')
