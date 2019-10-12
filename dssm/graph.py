@@ -32,7 +32,7 @@ class Graph:
     @staticmethod
     def cosine(p, h):
         p_norm = tf.norm(p, axis=1, keepdims=True)
-        h_norm = tf.norm(p, axis=1, keepdims=True)
+        h_norm = tf.norm(, axis=1, keepdims=True)
 
         cosine = tf.reduce_sum(tf.multiply(p, h), axis=1, keepdims=True) / (p_norm * h_norm)
 
